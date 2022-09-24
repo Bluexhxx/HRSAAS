@@ -35,9 +35,17 @@ module.exports = {
     overlay: {
       warnings: false,
       errors: true
-    }
+    },
     // 2.不用mock注释掉
     // before: require('./mock/mock-server.js')
+    // 开发环境下跨域配置 反向代理 生产环境下不同
+    proxy: {
+      // 当我们的本地的请求 有/api的时候，就会代理我们的请求地址向另外一个服务器发出请求
+      '/api': {
+        target: 'http://ihrm-java.itheima.net/',
+        changeOrigin: true // 只有这个值为true的情况下 才表示开启跨域
+      }
+    }
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
