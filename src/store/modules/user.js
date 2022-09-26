@@ -14,7 +14,8 @@ export default {
     async loginAction({ commit }, loginData) {
       // 请求
       try {
-        const { data: { data }} = await loginAPI(loginData)
+        const data = await loginAPI(loginData)
+        console.log(data)
         // 提交mutions
         commit('SET_TOKEN', data)
       } catch (e) {

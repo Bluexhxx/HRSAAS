@@ -89,8 +89,9 @@ export default {
         // 若不传入回调函数，则会返回一个 promise
         await this.$refs.loginForm.validate()
         // 2.校验成功后发请求 loading 为true
-        await this.$store.dispatch('user/loginAction', this.loginForm)
         this.loading = true
+        await this.$store.dispatch('user/loginAction', this.loginForm)
+        this.$router.push('/')
       } catch (e) {
         console.log(e)
       } finally {
