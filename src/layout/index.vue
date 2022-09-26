@@ -42,9 +42,9 @@ export default {
       }
     }
   },
-  created() {
-    this.$store.dispatch('user/getUserInfoAction')
-  },
+  // created() {
+  //   this.$store.dispatch('user/getUserInfoAction')
+  // },
   methods: {
     handleClickOutside() {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })

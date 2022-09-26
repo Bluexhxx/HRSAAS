@@ -16,6 +16,16 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+// 全局注册多个自定义指令
+// import { imgerror } from '@/directives'
+// Vue.directive('imgerror', imgerror)
+import * as directives from '@/directives'
+// 把的所有的自定义指令引入 命名为directives 类型是数组
+// 取出所有的自定义指令的名字 数组 遍历 注册
+Object.keys(directives).forEach(ele => {
+  Vue.directive(ele, directives[ele])
+  // Vue.directive('自定义指令的名字', 逻辑)
+})
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

@@ -6,3 +6,9 @@ export const getUserInfoAPI = () => {
     method: 'POST'
   })
 }
+
+export const getUserBasicInforByidAPI = (userId) => {
+  return request({
+    url: `/sys/user/${userId}`
+  })
+}
