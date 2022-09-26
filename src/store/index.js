@@ -17,13 +17,13 @@ const store = new Vuex.Store({
   plugins: [
     createPersistedState({
       key: 'HR_TOKEN',
-      // path: ['user.token']
-      reducer(state) {
-        return {
-          // reducer 层级要和vuex一样
-          user: { token: state.user.token }
-        }
-      }
+      path: ['user.token']
+      // reducer(state) {
+      //   return {
+      //     // reducer 层级要和vuex一样
+      //     user: { token: state.user.token }
+      //   }
+      // }
     })
   ]
 })
