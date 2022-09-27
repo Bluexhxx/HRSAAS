@@ -47,11 +47,10 @@ export default {
     },
     variables() {
       return variables
+    },
+    isCollapse() {
+      return !this.sidebar.opened
     }
-    // ,
-    // isCollapse() {
-    //   return !this.sidebar.opened
-    // }
   }
 }
 </script>
