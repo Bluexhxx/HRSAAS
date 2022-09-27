@@ -23,10 +23,10 @@ request.interceptors.response.use(
   response => {
     const { message, data, success } = response.data
     if (success) { // 业务逻辑成功
-      Message(message)
+      // Message(message)
       return data
     }
-    Message.error(message)
+    // Message.error(message)
     return Promise.reject(new Error(message))
   },
   error => {

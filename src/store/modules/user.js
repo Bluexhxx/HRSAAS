@@ -12,6 +12,9 @@ export default {
     SET_TOKEN(state, token) {
       state.token = token
     },
+    REMOVE_TOKEN(state) {
+      state.token = null
+    },
     SET_USERINFO(state, userInfo) {
       state.userInfo = userInfo
     },
@@ -20,6 +23,7 @@ export default {
     }
   },
   actions: {
+    // 登录操作
     async loginAction({ commit }, loginData) {
       // 请求
       try {
@@ -38,6 +42,13 @@ export default {
       commit('SET_USERINFO', result)
       // 深拷贝 返回一个新的res 防止复杂数据类型的原数据被改变
       return JSON.parse(JSON.stringify(result))
+    },
+    // 登出操作
+    logoOutAction({ commit }) {
+      // 删除用户信息
+      commit('REMOVE_USERINFO')
+      // 删除token
+      commit('REMOVE_TOKEN')
     }
   }
 }
