@@ -6,7 +6,8 @@ export default {
   namespaced: true,
   state: {
     token: null,
-    userInfo: {}
+    userInfo: {},
+    hrsaasTime: 0
   },
   mutations: {
     SET_TOKEN(state, token) {
@@ -20,6 +21,9 @@ export default {
     },
     REMOVE_USERINFO(state) {
       state.userInfo = {}
+    },
+    SET_HRASSA_TIME(state, hrsaasTime) {
+      state.hrsaasTime = hrsaasTime
     }
   },
   actions: {
@@ -30,6 +34,7 @@ export default {
         const data = await loginAPI(loginData)
         // 提交mutions
         commit('SET_TOKEN', data)
+        commit('SET_HRASSA_TIME', new Date().getTime())
       } catch (e) {
         console.log(e)
       }

@@ -17,7 +17,7 @@ const store = new Vuex.Store({
   plugins: [
     createPersistedState({
       key: 'HR_TOKEN',
-      path: ['user.token']
+      path: ['user.token', 'hrsaasTime']
       // reducer(state) {
       //   return {
       //     // reducer 层级要和vuex一样
