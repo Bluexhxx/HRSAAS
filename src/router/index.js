@@ -1,6 +1,16 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
+// 引入多个模块的规则
+import approvalsRouter from './modules/approvals.js'
+import departmentsRouter from './modules/departments.js'
+import employeesRouter from './modules/employees.js'
+import permissionRouter from './modules/permission.js'
+import attendancesRouter from './modules/attendances.js'
+import salarysRouter from './modules/salarys.js'
+import settingRouter from './modules/setting.js'
+import socialRouter from './modules/social.js'
+
 Vue.use(Router)
 
 /* Layout */
@@ -59,10 +69,11 @@ export const constantRoutes = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
+const asyncRoutes = [approvalsRouter, departmentsRouter, employeesRouter, permissionRouter, attendancesRouter, salarysRouter, settingRouter, socialRouter]
 const createRouter = () => new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
+  routes: [...constantRoutes, ...asyncRoutes]
 })
 
 const router = createRouter()
