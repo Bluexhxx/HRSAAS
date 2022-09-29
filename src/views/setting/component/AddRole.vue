@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="新增角色"
+    :title="title"
     width="30%"
     :visible="dialogVisible"
     @close="cancelDialog"
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { addRoleApi } from '@/api'
+import { addRoleApi, updateRoleByIdApi } from '@/api'
 export default {
   props: {
     dialogVisible: {
@@ -46,20 +46,30 @@ export default {
       loading: false
     }
   },
+  computed: {
+    title() {
+      return this.formData.id ? '编辑角色' : '新增角色'
+    }
+  },
   methods: {
     cancelDialog() {
       this.$emit('update:dialogVisible', false)
       this.$refs.roleDialogForm.resetFields()
+      this.formData = { // 关闭的时候清空表单里的数据
+        name: '',
+        description: ''
+      }
     },
     async submit() {
       try {
         await this.$refs.roleDialogForm.validate()
         // 校验成功后
         this.loading = true
-        await addRoleApi(this.formData)
+        // 区分是新增还是编辑功能
+        this.formData.id ? await updateRoleByIdApi(this.formData) : await addRoleApi(this.formData)
+        this.$message.success(this.formData.id ? '更新成功！' : '添加成功')
         this.$emit('UpdateRoleList')
-        // 提示消息
-        this.$message.success('添加成功！')
+
         // 关闭dialog
         this.cancelDialog()
       } catch (error) {
@@ -71,3 +81,9 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+  .el-dialog {
+    // 设置过渡，出现与消失的动画是靠过渡实现的
+    transition: all 0.3s;
+  }
+</style>

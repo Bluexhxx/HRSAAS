@@ -30,3 +30,24 @@ export const addRoleApi = ({ name, description }) => {
     }
   })
 }
+
+export const updateRoleByIdApi = (data) => {
+  return request({
+    url: `/sys/role/${data.id}`,
+    method: 'PUT',
+    data
+  })
+}
+
+export const delRoleByIdApi = (id) => {
+  return request({
+    url: `/sys/role/${id}`,
+    method: 'DELETE'
+  })
+}
+
+export const queryComponeyIdApi = (id) => {
+  return request({
+    url: `/company/${id}`
+  })
+}
