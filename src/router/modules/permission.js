@@ -8,7 +8,7 @@ export default {
     {
       path: '',
       component: () => import('@/views/permission'),
-      meta: { title: '组织架构', icon: 'lock' }
+      meta: { title: '审批', icon: 'lock' }
     }
   ]
 }
