@@ -6,18 +6,21 @@
     <el-tree :data="departs" :props="defaultTreeProps" :default-expand-all="true">
       <!-- 传入内容 插槽内容 会循环多次 有多少节点 就循环多少次 -->
       <!-- 作用域插槽 slot-scope="obj" 接收传递给插槽的数据   data 每个节点的数据对象-->
-      <TreeTool slot-scope="{ data }" :tree-node="data" />
+      <TreeTool slot-scope="{ data }" :tree-node="data" @addDept="handleDept" />
     </el-tree>
+    <AddDept :dialog-visible.sync="showDialog" :current-node="currentNode" />
   </div>
 </template>
 
 <script>
+import AddDept from './components/AddDept.vue'
 import TreeTool from './components/TreeTool.vue'
 import { getDepartmentsApi } from '@/api'
+import { tranListToTreeData } from '@/utils'
 export default {
   name: 'Department',
   components: {
-    TreeTool
+    TreeTool, AddDept
   },
   data() {
     return {
@@ -25,12 +28,12 @@ export default {
         children: 'children',
         label: 'name'
       },
+      showDialog: false,
       componeyname: { name: '江苏传智播客教育科技股份有限公司', manager: '负责人' },
-      departs: [
-        // 一行对应一条数据(一个对象)
-        { name: '总裁办', manager: '曹操', children: [{ name: '董事会', manager: '曹丕' }] },
-        { name: '行政部', manager: '刘备' },
-        { name: '人事部', manager: '孙权' }]
+      departs: [],
+      currentNode: {}
+      //  departs: [
+      //   { name: '总裁办', manager: '曹操', children: [{ name: '董事会', manager: '曹丕' }] }]
 
     }
   },
@@ -40,11 +43,19 @@ export default {
   methods: {
     async getDepartments() {
       try {
-        const { data } = await getDepartmentsApi()
-        this.departs = data
+        const { depts, companyName, companyManage } = await getDepartmentsApi()
+
+        this.departs = tranListToTreeData(depts, '')
+        this.componeyname = { name: companyName, manager: companyManage }
       } catch (error) {
         console.log(error)
       }
+    },
+    handleDept(treeNode) {
+      // 显示dept
+      this.showDialog = true
+      this.currentNode = treeNode
+      console.log(treeNode)
     }
   }
 }
