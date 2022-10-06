@@ -1,6 +1,6 @@
 <template>
   <!-- 新增部门的弹层 -->
-  <el-dialog title="新增部门" :visible="dialogVisible" @close="handleClose">
+  <el-dialog :title="title" :visible="dialogVisible" @close="handleClose">
     <!-- 表单组件  el-form   label-width设置label的宽度   -->
     <!-- 匿名插槽 -->
     <el-form ref="form" label-width="120px" :model="formData" :rules="rules">
@@ -11,8 +11,8 @@
         <el-input v-model="formData.code" style="width:80%" placeholder="1-50个字符" />
       </el-form-item>
       <el-form-item label="部门负责人" prop="manager">
-        <el-select v-model="formData.manager" style="width:80%" placeholder="请选择">
-          <el-option label="username11" value="username" />
+        <el-select v-model="formData.manager" style="width:80%" placeholder="请选择" @focus="getEmployeeSimple">
+          <el-option v-for="(item,index) in peoples" :key="index" :label="item.username" :value="item.username" />
         </el-select>
       </el-form-item>
       <el-form-item label="部门介绍" prop="introduce">
@@ -23,7 +23,7 @@
     <el-row slot="footer" type="flex" justify="center">
       <!-- 列被分为24 -->
       <el-col :span="6">
-        <el-button type="primary" size="small">确定</el-button>
+        <el-button v-loading="loading" type="primary" size="small" @click="submit">确定</el-button>
         <el-button size="small">取消</el-button>
       </el-col>
     </el-row>
@@ -37,14 +37,9 @@
 部门负责人（manager）：必填
 部门介绍 ( introduce)：必填 1-300个字符
 */
-import { getDepartmentsApi } from '@/api'
+import { getDepartmentsApi, getEmployeeSimpleApi, addDepartmentsApi, updateDepartmentsAPi } from '@/api'
 export default {
   name: 'AddDept',
-  components: {},
-  directives: {},
-  filters: {},
-  mixins: [],
-  model: {},
   props: {
     dialogVisible: {
       type: Boolean,
@@ -59,17 +54,30 @@ export default {
   data() {
     const checkCodeRepeat = async(rule, value, callback) => {
       const { depts } = await getDepartmentsApi()
-      // console.log(depts)
-      const isRepate = depts.some(ele => ele.code === value)
-      isRepate ? callback(new Error(`模块下已存在${value}编码`)) : callback()
+      let isRepeat = false
+      if (this.formData.id) {
+        // 编辑模式  因为编辑模式下 不能算自己
+        isRepeat = depts.some(item => item.id !== this.formData.id && item.code === value && value)
+      } else {
+        // 新增模式
+        isRepeat = depts.some(item => item.code === value && value) // 这里加一个 value不为空 因为我们的部门有可能没有code
+      }
+
+      isRepeat ? callback(new Error(`组织架构中已经有部门使用${value}编码`)) : callback()
     }
 
     const nameCheck = async(rule, value, callback) => {
       const { depts } = await getDepartmentsApi()
-      // 找同级部门
-      const isRepeat = depts.filter(item => item.pid === this.treeNode.id).some(item => item.name === value)
-      console.log('dept', isRepeat)
-      isRepeat ? callback(new Error(`模块下已存在${value}名称`)) : callback()
+      let isRepeat = false
+      if (this.formData.id) {
+        // 有id就是编辑模式
+        // 编辑 张三 => 校验规则 除了我之外 同级部门下 不能有叫张三的
+        isRepeat = depts.filter(item => item.pid === this.treeNode.pid && item.id !== this.formData.id).some(item => item.name === value)
+      } else {
+        // 没id就是新增模式
+        isRepeat = depts.filter(item => item.pid === this.treeNode.id).some(item => item.name === value)
+      }
+      isRepeat ? callback(new Error(`同级部门下已经有${value}的部门了`)) : callback()
     }
     return {
       formData: {
@@ -78,6 +86,8 @@ export default {
         manager: '', // 部门管理者
         introduce: '' // 部门介绍
       },
+      loading: false,
+      peoples: [],
       rules: {
         name: [
           { required: true, message: '部门名称必填', trigger: 'blur' },
@@ -99,27 +109,50 @@ export default {
       }
     }
   },
-  computed: {},
-  watch: {},
-  beforeCreate() {},
-  created() {
-
+  computed: {
+    title() {
+      return this.formData.id ? '编辑部门' : '新增部门'
+    }
   },
-  beforeMount() {},
-  mounted() {
-
-  },
-  beforeUpdate() {},
-  updated() {},
-  activated() {},
-  deactivated() {},
-  beforeDestroy() {},
-  destroyed() {},
   // 方法集合
   methods: {
     handleClose() {
       this.$emit('update:dialog-visible', false)
       this.$refs.form.resetFields()
+      this.formData = {
+        name: '', // 部门名称
+        code: '', // 部门编码
+        manager: '', // 部门管理者
+        introduce: '' // 部门介绍
+      }
+    },
+    async getEmployeeSimple() {
+      this.peoples = await getEmployeeSimpleApi()
+      // console.log(this.peoples)
+    },
+    // 新增
+    async submit() {
+      try {
+        // 1.表单校验
+        await this.$refs.form.validate()
+        // 2.loading
+        this.loading = true
+        // 3.发请求
+        if (this.formData.id) {
+          await updateDepartmentsAPi({ ...this.formData })
+        } else {
+          await addDepartmentsApi({ ...this.formData, pid: this.treeNode.id })
+        }
+        // 4.刷新页面
+        this.$parent.getDepartments()
+        this.$message.success(`${this.formData.id ? '编辑' : '新增'}成功`)
+        // 5.关闭弹窗
+        this.handleClose()
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.loading = false
+      }
     }
   }
 }

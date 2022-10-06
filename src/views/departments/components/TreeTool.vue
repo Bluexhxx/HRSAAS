@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import { delDepartmentsApi } from '@/api'
 export default {
   props: {
     treeNode: {
@@ -44,15 +45,30 @@ export default {
     }
   },
   methods: {
-    handleCommand(type) {
+    async handleCommand(type) {
       if (type === 'add') {
         // 新增操作
         // 触发告诉父组件显示弹框
         this.$emit('addDept', this.treeNode)
       } else if (type === 'edit') {
         // 编辑操作
+        this.$emit('editDept', this.treeNode)
       } else {
         // 删除操作
+        this.$confirm('此操作将删除, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async(res) => {
+          return delDepartmentsApi()
+        }).then((res) => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        }).catch(() => {
+          console.log('取消')
+        })
       }
     }
   }
