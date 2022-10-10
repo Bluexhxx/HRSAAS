@@ -1,22 +1,12 @@
 <template>
   <div>
-    <!-- <PageTools type="success" :is-show-before="true">
-      <template #before>
-        <span>共25条记录</span>
-      </template>
-      # 是v-slot: 的缩写
-      <template v-slot:after>
-        <el-button size="small" type="warning">导入</el-button>
-        <el-button size="small" type="danger">导出</el-button>
-      </template>
-    </PageTools> -->
     <div class="app-container">
       <PageTools>
         <span slot="before">共166条记录</span>
         <template slot="after">
           <el-button size="small" type="warning">导入</el-button>
           <el-button size="small" type="danger">导出</el-button>
-          <el-button size="small" type="primary">新增员工</el-button>
+          <el-button size="small" type="primary" @click="handelAddEmp">新增员工</el-button>
         </template>
       </PageTools>
       <!-- 放置表格和分页 -->
@@ -38,13 +28,13 @@
             </template>
           </el-table-column>
           <el-table-column label="操作" fixed="right" width="280">
-            <template>
+            <template slot-scope="{ row }">
               <el-button type="text" size="small">查看</el-button>
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
               <el-button type="text" size="small">角色</el-button>
-              <el-button type="text" size="small">删除</el-button>
+              <el-button type="text" size="small" @click="deleteEmployee(row.id)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -61,20 +51,24 @@
           />
         </el-row>
       </el-card>
+      <!-- 新增员工弹窗 -->
+      <AddEmployees :add-empvisible.sync="addEmpvisible" />
     </div>
 
   </div>
 </template>
 
 <script>
-import { getEmployeeListApi } from '@/api'
+import { getEmployeeListApi, delEmployeeApi } from '@/api'
 import EmpConstData from '@/api/constant/employees'
+import AddEmployees from './component/AddEmployees.vue'
 // console.log(EmpConstData)
 // import PageTools from '@/components/PageTools'
 export default {
   name: 'Employees',
   components: {
     // PageTools
+    AddEmployees
   },
   data() {
     return {
@@ -85,7 +79,8 @@ export default {
       },
       list: [], // 接数据的
       total: 0, // 总数
-      hireType: EmpConstData.hireType // [{id: 1,value: '正式'},{id: 2,value: '非正式'}]
+      hireType: EmpConstData.hireType, // [{id: 1,value: '正式'},{id: 2,value: '非正式'}]
+      addEmpvisible: false
     }
   },
   created() {
@@ -107,7 +102,23 @@ export default {
     formatEmployment(row, column, cellValue, index) {
       // 要去找 1所对应的值
       const obj = this.hireType.find(item => item.id === cellValue)
-      return obj ? obj.value : '未知'
+      // return obj ? obj.value : '未知'
+      return obj && obj.value || this.hireType[1].value
+    },
+    handelAddEmp() {
+      // 打开弹窗
+      this.addEmpvisible = true
+    },
+    async deleteEmployee(id) {
+      try {
+        await this.$confirm('确认删除该员工吗？', '提示', {
+          type: 'warning'
+        })
+        await delEmployeeApi(id) // 请求
+        this.getEmployeeList() // 刷新列表
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 }

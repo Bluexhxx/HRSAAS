@@ -18,3 +18,25 @@ export function getEmployeeListApi(params) {
     params
   })
 }
+
+/** **
+ *  新增员工的接口
+ * **/
+export function addEmployeeApi(data) {
+  return request({
+    method: 'post',
+    url: '/sys/user',
+    data
+  })
+}
+
+/**
+ * 删除员工接口
+ * ****/
+
+export function delEmployeeApi(id) {
+  return request({
+    url: `/sys/user/${id}`,
+    method: 'delete'
+  })
+}
