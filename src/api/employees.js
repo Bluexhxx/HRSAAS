@@ -40,3 +40,16 @@ export function delEmployeeApi(id) {
     method: 'delete'
   })
 }
+
+/** *
+ *  封装一个导入员工的接口
+ *
+ * ***/
+
+export function importEmployeeApi(data) {
+  return request({
+    url: '/sys/user/batch',
+    method: 'POST',
+    data
+  })
+}

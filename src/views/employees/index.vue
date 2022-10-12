@@ -4,8 +4,8 @@
       <PageTools>
         <span slot="before">共166条记录</span>
         <template slot="after">
-          <el-button size="small" type="warning">导入</el-button>
-          <el-button size="small" type="danger">导出</el-button>
+          <el-button size="small" type="warning" @click="$router.push('/Import')">导入</el-button>
+          <el-button size="small" type="danger" @click="exportExcle">导出</el-button>
           <el-button size="small" type="primary" @click="handelAddEmp">新增员工</el-button>
         </template>
       </PageTools>
@@ -59,6 +59,7 @@
 </template>
 
 <script>
+// import UploadExcel from '@/components/UploadExcel'
 import { getEmployeeListApi, delEmployeeApi } from '@/api'
 import EmpConstData from '@/api/constant/employees'
 import AddEmployees from './component/AddEmployees.vue'
@@ -115,10 +116,55 @@ export default {
           type: 'warning'
         })
         await delEmployeeApi(id) // 请求
+        this.$message.success('删除成功')
         this.getEmployeeList() // 刷新列表
       } catch (error) {
         console.log(error)
       }
+    },
+    // 导出excle
+    async exportExcle() {
+      const exportExcelMapPath = {
+        '手机号': 'mobile',
+        '姓名': 'username',
+        '入职日期': 'timeOfEntry',
+        '聘用形式': 'formOfEmployment',
+        '转正日期': 'correctionTime',
+        '工号': 'workNumber',
+        '部门': 'departmentName'
+      }
+      const header = Object.keys(exportExcelMapPath)
+      // console.log('export')
+      // 该功能使用次数比较少 使用文件懒加载的方式 在点击的时候触发加载文件
+      // import() 当做方法使用 返回的是promise
+      // 相当于原来的按需引入 import {export_json_to_excel} from '@/vendor/Export2Excel.js'
+      const { export_json_to_excel } = await import('@/vendor/Export2Excel.js')
+      // 获取所有的员工数据
+      const { rows } = await getEmployeeListApi({ page: 1, size: this.total })
+      console.log(rows)
+      // 处理数据格式
+      const data = rows.map((item) => { // map 表头能返回 顺序对应，长度相同的新数组
+        return header.map((h) => { // 确定每个数组内的内容 根据映射表先取出英文的key 然后去拿数据
+        // 判断聘用形式
+          if (h === '聘用形式') {
+            // 判断是聘用形式 就用find查找到那一项
+            const find = this.hireType.find((hireType) => {
+              return hireType.id === item[exportExcelMapPath[h]]
+            })
+            return find ? find.value : '未知'
+          }
+          // console.log(item[exportExcelMapPath[h]])
+          return item[exportExcelMapPath[h]]
+        })
+      })
+      export_json_to_excel({
+        header, // 表头 必填
+        // 一个数组就是一行数据
+        data, // 具体数据 必填
+        filename: 'excel-list', // 导出文件名
+        autoWidth: true, // 单元格是否要自适应宽度
+        bookType: 'xlsx' // 导出文件类型
+      })
     }
   }
 }

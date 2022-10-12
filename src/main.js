@@ -27,7 +27,7 @@ import '@/permission' // permission control
 //   // Vue.directive('自定义指令的名字', 逻辑)
 // })
 // 全局注册自定义组件
-import components from '@/components'
+import components from '@/components/index1'
 Vue.use(components)
 /**
  * If you don't want to use mock-server
