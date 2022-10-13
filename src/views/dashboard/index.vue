@@ -3,6 +3,7 @@
     <div class="dashboard-text">name: {{ name }}</div>
     <!-- <UploadExcel :before-upload="beforeUploadFn" :on-success="onSuccessFn" /> -->
     <!-- <svg-icon iconClass="eye-open"></svg-icon> 测试-->
+    <UploadImg />
   </div>
 </template>
 
