@@ -203,7 +203,7 @@
       </div>
       <!-- 从业信息 -->
       <el-form-item>
-        <el-button type="primary">保存更新</el-button>
+        <el-button type="primary" @click="updateJob">保存更新</el-button>
         <el-button @click="$router.back()">返回</el-button>
       </el-form-item>
     </el-form>
@@ -212,7 +212,7 @@
 
 <script>
 import EmployeeEnum from '@/api/constant/employees'
-
+import { getJobDetailApi, updateJobApi } from '@/api'
 export default {
   data() {
     return {
@@ -246,6 +246,27 @@ export default {
         workMailbox: '', // 工作邮箱
         workingCity: '', // 工作城市
         workingTimeForTheFirstTime: '' // 首次参加工作时间
+      }
+    }
+  },
+  created() {
+    this.getJobDetail()
+  },
+  methods: {
+    async getJobDetail() {
+      try {
+        this.formData = await getJobDetailApi(this.userId)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async updateJob() {
+      try {
+        this.formData = await updateJobApi(this.formData)
+        this.$message.success('更新成功')
+      } catch (error) {
+        this.$message.fail('更新失败')
+        console.log(error)
       }
     }
   }
