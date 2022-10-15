@@ -14,6 +14,18 @@
         <el-table v-loading="loading" border :data="list">
           <el-table-column label="序号" sortable="" width="80" type="index" />
           <el-table-column label="姓名" prop="username" />
+          <el-table-column label="头像" align="center">
+            <template slot-scope="{row}">
+              <img
+                slot="reference"
+                v-imageerror="require('@/assets/common/bigUserHeader.png')"
+                :src="row.staffPhoto"
+                style="border-radius: 50%; width: 80px; height: 80px; padding: 5px"
+                alt=""
+                @click="showErCodeDialog(row.staffPhoto)"
+              >
+            </template>
+          </el-table-column>
           <el-table-column label="工号" prop="workNumber" />
           <el-table-column label="聘用形式" prop="formOfEmployment" :formatter="formatEmployment" />
           <el-table-column label="部门" prop="departmentName" />
@@ -53,6 +65,9 @@
       </el-card>
       <!-- 新增员工弹窗 -->
       <AddEmployees :add-empvisible.sync="addEmpvisible" />
+      <el-dialog title="头像二维码" :visible.sync="ercodeDialog">
+        <canvas id="canvas" />
+      </el-dialog>
     </div>
 
   </div>
@@ -63,6 +78,7 @@
 import { getEmployeeListApi, delEmployeeApi } from '@/api'
 import EmpConstData from '@/api/constant/employees'
 import AddEmployees from './component/AddEmployees.vue'
+import QrCode from 'qrcode'
 // console.log(EmpConstData)
 // import PageTools from '@/components/PageTools'
 export default {
@@ -81,7 +97,8 @@ export default {
       list: [], // 接数据的
       total: 0, // 总数
       hireType: EmpConstData.hireType, // [{id: 1,value: '正式'},{id: 2,value: '非正式'}]
-      addEmpvisible: false
+      addEmpvisible: false,
+      ercodeDialog: false // 二维码
     }
   },
   created() {
@@ -168,6 +185,15 @@ export default {
     },
     goDetail(row) {
       this.$router.push('/employees/detail/' + row.id)
+    },
+    showErCodeDialog(staffPhoto) {
+      if (!staffPhoto) return this.$message.error('该用户还未设置头像')
+      this.ercodeDialog = true
+
+      this.$nextTick(() => {
+        const canvas = document.getElementById('canvas')
+        QrCode.toCanvas(canvas, staffPhoto)
+      })
     }
   }
 }

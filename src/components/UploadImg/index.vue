@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-upload
+      v-loading="loading"
       class="elUpload"
       action="#"
       list-type="picture-card"
@@ -9,6 +10,7 @@
       :on-preview="onPreview"
       :http-request="httpRequest"
       :before-upload="beforeUplaod"
+      :file-list="fileList"
       :limit="1"
     >
       <i class="el-icon-plus" />
@@ -24,14 +26,35 @@
 </template>
 
 <script>
+import COS from 'cos-js-sdk-v5'
+const cos = new COS({
+  // 不推荐写明文 只适合前端调试 应该向后端请求
+  SecretId: 'AKID0rc9GE0ZyCD2e4wdx2vb4IH2ZrujK0Ti',
+  SecretKey: '3sWxBD1c2HQODtZBtiOvHQM8i7JJDwWt'
+})
 export default {
   name: 'UploadImg',
+  props: {
+    defaultUrl: {
+      type: String,
+      default: () => ''
+    }
+  },
   data() {
     return {
+      loading: false,
       previewImgUrl: '',
       previewImgDialogVisible: false,
-      fileList: [{ name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100' }]
+      fileList: []
 
+    }
+  },
+  watch: {
+    defaultUrl() {
+      // 监视父组件传过来的值 存入filelist
+      this.fileList.push({
+        name: 'default', url: this.defaultUrl
+      })
     }
   },
   methods: {
@@ -58,8 +81,25 @@ export default {
       }
       return true
     },
-    httpRequest() {
-      console.log('...')
+    httpRequest({ file }) {
+      // console.log(file)
+      this.loading = true
+      cos.putObject({
+        Bucket: 'xhxxblue-1314348514', /* 填入您自己的存储桶，必须字段 */
+        Region: 'ap-nanjing', /* 存储桶所在地域，例如ap-beijing，必须字段 */
+        Key: file.name, /* 存储在桶里的对象键（例如1.jpg，a/b/test.txt），必须字段 */
+        Body: file, /* 必须，上传文件对象，可以是input[type="file"]标签选择本地文件后得到的file对象 */
+        onProgress: function(progressData) {
+          // console.log(JSON.stringify(progressData))
+        }
+      }, (err, data) => {
+        if (err) return this.$message.error('上传失败！')
+        this.loading = false
+        // 通知父组件上传成功
+        this.$emit('on-success', {
+          imgUrl: 'https://' + data.Location
+        })
+      })
     },
     onPreview(file) {
       this.previewImgUrl = file.url

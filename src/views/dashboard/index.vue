@@ -3,7 +3,8 @@
     <div class="dashboard-text">name: {{ name }}</div>
     <!-- <UploadExcel :before-upload="beforeUploadFn" :on-success="onSuccessFn" /> -->
     <!-- <svg-icon iconClass="eye-open"></svg-icon> 测试-->
-    <UploadImg />
+    <UploadImg @on-success="onSuccess1" />
+    <UploadImg @on-success="onSuccess2" />
   </div>
 </template>
 
@@ -16,8 +17,15 @@ export default {
     ...mapGetters([
       'name'
     ])
-  }
-  // methods: {
+  },
+  methods: {
+    // 图片上传第一次成功回调函数
+    onSuccess1() {
+      console.log(111)
+    },
+    onSuccess2() {
+      console.log(111)
+    }
   //   onSuccessFn(data) {
   //     console.log('data', data)
   //     // 拿到数据 写具体业务逻辑
@@ -31,7 +39,7 @@ export default {
   //     }
   //     return true
   //   }
-  // }
+  }
 }
 </script>
 

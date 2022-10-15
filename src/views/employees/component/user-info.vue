@@ -1,5 +1,6 @@
 <template>
   <div class="user-info">
+    <i class="el-icon-printer" @click="$router.push('/employees/print/'+ userId)" />
     <!-- 个人信息 -->
     <el-form label-width="220px">
       <!-- 工号 入职时间 -->
@@ -58,6 +59,7 @@
         <el-col :span="12">
           <el-form-item label="员工头像">
             <!-- 放置上传图片 -->
+            <UploadImg ref="staffPhoto" :default-url="employesAvatar" @onSuccess="onEmployeesHeadImg" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -91,6 +93,8 @@
 
         <el-form-item label="员工照片">
           <!-- 放置上传图片 -->
+          <UploadImg ref="empPohto" :default-url="employesPhoto" @onSuccess="onEmpPohto" />
+
         </el-form-item>
         <el-form-item label="国家/地区">
           <el-select v-model="formData.nationalArea" class="inputW2">
@@ -386,12 +390,15 @@
 </template>
 
 <script>
-
+import UploadImg from '@/components/UploadImg'
 import EmployeeEnum from '@/api/constant/employees'
 import { getPersonalDetail, getUserBasicInforByidAPI, updatePersonal, saveUserDetailById } from '@/api'
 export default {
+  components: { UploadImg },
   data() {
     return {
+      employesPhoto: '', // 员工照片
+      employesAvatar: '', // 员工头像
       userId: this.$route.params.id,
       EmployeeEnum, // 员工枚举数据
       userInfo: {},
@@ -468,12 +475,18 @@ export default {
     async loadUserInfo() {
       const res = await getUserBasicInforByidAPI(this.userId)
       this.userInfo = res
+      this.employesAvatar = res.staffPhoto
+      // console.log(this.employesAvatar)
     },
     async getFormData() {
       const res = await getPersonalDetail(this.userId)
+      this.employesPhoto = res.staffPhoto
       this.formData = res
     },
     async saveEmpInfo() {
+      if (this.$refs.empPohto.loading) {
+        return this.$message.error('图片还未上传完成')
+      }
       try {
         await updatePersonal(this.formData)
         this.$message.success('更新成功')
@@ -482,12 +495,23 @@ export default {
       }
     },
     async saveUserDetail() {
+      if (this.$refs.staffPhoto.loading) {
+        return this.$message.error('图片还未上传完成')
+      }
       try {
         await saveUserDetailById(this.userInfo)
         this.$message.success('更新成功')
       } catch (error) {
         this.$message.error('更新失败')
       }
+    },
+    // 监听头像上传成功
+    onEmployeesHeadImg(data) {
+      console.log(data)
+      this.userInfo.staffPhoto = data.imgUrl
+    },
+    onEmpPohto(data) {
+      this.formData.staffPhoto = data.imgUrl
     }
   }
 }
