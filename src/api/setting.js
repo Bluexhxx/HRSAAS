@@ -30,6 +30,11 @@ export const addRoleApi = ({ name, description }) => {
     }
   })
 }
+export const getRoles = () => {
+  return request({
+    url: '/sys/role'
+  })
+}
 
 export const updateRoleByIdApi = (data) => {
   return request({

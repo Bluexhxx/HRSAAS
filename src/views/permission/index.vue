@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'HrsaasIndex',
+  name: 'PermissonIndex',
   data() {
     return {
 

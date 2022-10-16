@@ -18,7 +18,7 @@
             <el-table-column label="描述" prop="description" />
             <el-table-column label="操作" width="240">
               <template slot-scope="{row}">
-                <el-button size="small" type="success">分配权限</el-button>
+                <el-button size="small" type="success" @click="goManagerPermission(row.id)">分配权限</el-button>
                 <el-button size="small" type="primary" @click="editRow(row)">编辑</el-button>
                 <el-button size="small" type="danger" @click="delRow(row.id)">删除</el-button></template>
             </el-table-column>
@@ -64,17 +64,19 @@
     </el-card>
     <add-role ref="AddRole" :dialog-visible.sync="dialogVisible" @UpdateRoleList="getRoleList" />
     <!-- @updata:dialogvisible 相当于绑定了这个事件 -->
+    <ManagerPermission :role-id="roleId" :dialog-visible.sync="ManagerPermissionVisible" />
   </div>
 </template>
 
 <script>
+import ManagerPermission from './component/ManagerPermission.vue'
 import { getRoleListApi, delRoleByIdApi, queryComponeyIdApi } from '@/api'
 import AddRole from './component/AddRole.vue'
 import { mapGetters } from 'vuex'
 export default {
   name: 'Setting',
   components: {
-    AddRole
+    AddRole, ManagerPermission
   },
   data() {
     return {
@@ -88,7 +90,9 @@ export default {
       roleList: [],
       total: 0, // 记录总数,
       dialogVisible: false,
-      CompanyInfo: {}
+      CompanyInfo: {},
+      ManagerPermissionVisible: false,
+      roleId: ''
     }
   },
   computed: {
@@ -149,6 +153,12 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+    // 分配权限弹层
+    goManagerPermission(id) {
+      // console.log(id)
+      this.roleId = id
+      this.ManagerPermissionVisible = true
     }
   }
 }

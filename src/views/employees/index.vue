@@ -18,7 +18,6 @@
             <template slot-scope="{row}">
               <img
                 slot="reference"
-                v-imageerror="require('@/assets/common/bigUserHeader.png')"
                 :src="row.staffPhoto"
                 style="border-radius: 50%; width: 80px; height: 80px; padding: 5px"
                 alt=""
@@ -45,7 +44,7 @@
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
-              <el-button type="text" size="small">角色</el-button>
+              <el-button type="text" size="small" @click="goRoloDig(row)">角色</el-button>
               <el-button type="text" size="small" @click="deleteEmployee(row.id)">删除</el-button>
             </template>
           </el-table-column>
@@ -68,12 +67,18 @@
       <el-dialog title="头像二维码" :visible.sync="ercodeDialog">
         <canvas id="canvas" />
       </el-dialog>
+      <!-- 分配角色弹层 -->
+      <RoleDig
+        :visible.sync="visibleRole"
+        :role-id="roleId"
+      />
     </div>
 
   </div>
 </template>
 
 <script>
+import RoleDig from './component/RoleDig.vue'
 // import UploadExcel from '@/components/UploadExcel'
 import { getEmployeeListApi, delEmployeeApi } from '@/api'
 import EmpConstData from '@/api/constant/employees'
@@ -85,10 +90,12 @@ export default {
   name: 'Employees',
   components: {
     // PageTools
-    AddEmployees
+    AddEmployees,
+    RoleDig
   },
   data() {
     return {
+      visibleRole: false,
       loading: false,
       page: {
         page: 1, // 当前页码
@@ -98,7 +105,8 @@ export default {
       total: 0, // 总数
       hireType: EmpConstData.hireType, // [{id: 1,value: '正式'},{id: 2,value: '非正式'}]
       addEmpvisible: false,
-      ercodeDialog: false // 二维码
+      ercodeDialog: false, // 二维码
+      roleId: ''
     }
   },
   created() {
@@ -194,11 +202,12 @@ export default {
         const canvas = document.getElementById('canvas')
         QrCode.toCanvas(canvas, staffPhoto)
       })
+    },
+    goRoloDig(row) {
+      this.roleId = row.id
+      this.visibleRole = true
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-
-</style>
