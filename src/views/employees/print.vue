@@ -1,7 +1,8 @@
 <template>
-  <div id="myPrint" class="dashboard-container">
+  <div class="dashboard-container">
     <div class="app-container">
-      <el-card>
+      <el-button v-print="'myPrint'" size="small" type="primary">打印</el-button>
+      <el-card id="myPrint">
         <el-breadcrumb separator="/" class="titInfo ">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
           <el-breadcrumb-item>
@@ -328,8 +329,8 @@
 </template>
 
 <script>
-import { getPersonalDetail, getJobDetail } from '@/api/employees'
-import { getUserDetailById } from '@/api/user'
+import { getPersonalDetail, getJobDetailApi as getJobDetail } from '@/api/employees'
+import { getUserBasicInforByidAPI as getUserDetailById } from '@/api/user'
 export default {
   data() {
     return {

@@ -29,6 +29,8 @@ import '@/permission' // permission control
 // 全局注册自定义组件
 import components from '@/components/index1'
 Vue.use(components)
+import Print from 'vue-print-nb'
+Vue.use(Print)
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
